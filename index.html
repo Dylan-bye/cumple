@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feliz Cumpleaños Ruth ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ============ VARIABLES / TEMA MORADO NEÓN ============ */
+  :root{
+    --bg:#0f0e17;
+    --p1:#7928ca;
+    --p2:#b721ff;
+    --glow:rgba(183,33,255,.55);
+    --glass:rgba(255,255,255,.06);
+    --border:rgba(183,33,255,.35);
+    --text:#eae6ff;
+    --muted:#a99cd1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',sans-serif;color:var(--text);
+    background:
+      radial-gradient(circle at 15% 20%, rgba(121,40,202,.35), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(183,33,255,.25), transparent 45%),
+      var(--bg);
+    overflow-x:hidden; min-height:100vh;
+  }
+  canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+  canvas#confetti{position:fixed;inset:0;z-index:50;pointer-events:none}
+
+  /* ============ PANTALLA DE ENTRADA (necesaria para el autoplay) ============ */
+  #intro{
+    position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:22px;text-align:center;padding:20px;
+    background:radial-gradient(circle, #1a1030, #0f0e17 70%);
+    transition:opacity .8s, visibility .8s;
+  }
+  #intro.hide{opacity:0;visibility:hidden}
+  #intro p{color:var(--muted);letter-spacing:.2em;font-size:.8rem;text-transform:uppercase}
+
+  .btn{
+    font-family:'Orbitron',sans-serif;font-weight:600;letter-spacing:.12em;
+    color:#fff;border:none;cursor:pointer;padding:15px 34px;border-radius:50px;
+    background:linear-gradient(135deg,var(--p1),var(--p2));
+    box-shadow:0 0 22px var(--glow);transition:.25s;font-size:.85rem;
+  }
+  .btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 0 40px var(--p2)}
+  .btn.ghost{background:transparent;border:1px solid var(--p2);box-shadow:none}
+  .btn.ghost:hover{background:rgba(183,33,255,.2);box-shadow:0 0 25px var(--glow)}
+
+  /* ============ HERO ============ */
+  main{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;
+       align-items:center;justify-content:center;text-align:center;padding:30px 18px 170px}
+  .tag{color:var(--p2);letter-spacing:.4em;font-size:.8rem;text-transform:uppercase;
+       animation:fade 1.2s both}
+  h1{
+    font-family:'Orbitron',sans-serif;font-weight:900;line-height:1.1;
+    font-size:clamp(2.2rem,8vw,5.6rem);margin:14px 0;
+    background:linear-gradient(90deg,#fff,var(--p2),var(--p1),#fff);
+    background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:shine 5s linear infinite, rise 1.2s both;
+    filter:drop-shadow(0 0 18px var(--glow));
+  }
+  .age{
+    font-family:'Orbitron',sans-serif;font-size:clamp(1.3rem,4.5vw,2.6rem);
+    color:#fff;text-shadow:0 0 10px var(--p2),0 0 30px var(--p2),0 0 60px var(--p1);
+    animation:pulse 2.5s ease-in-out infinite;
+  }
+  .name{margin-top:10px;color:var(--muted);font-weight:300;font-size:1.1rem}
+  .actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:36px}
+
+  @keyframes shine{to{background-position:300% 0}}
+  @keyframes rise{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes pulse{50%{transform:scale(1.06);filter:brightness(1.3)}}
+
+  /* ============ TARJETA SORPRESA (modal con flip) ============ */
+  #modal{
+    position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
+    background:rgba(8,6,16,.75);backdrop-filter:blur(8px);padding:20px;
+  }
+  #modal.open{display:flex}
+  .card3d{width:min(380px,92vw);height:440px;perspective:1200px;cursor:pointer}
+  .card-inner{position:relative;width:100%;height:100%;transition:transform .9s cubic-bezier(.2,.8,.2,1);
+              transform-style:preserve-3d}
+  .card3d.flip .card-inner{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;border-radius:22px;padding:30px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;
+    background:var(--glass);border:1px solid var(--border);backdrop-filter:blur(14px);
+    box-shadow:0 0 45px var(--glow), inset 0 0 30px rgba(183,33,255,.12);
+  }
+  .face.back{transform:rotateY(180deg);background:linear-gradient(160deg,rgba(121,40,202,.35),rgba(15,14,23,.9))}
+  .face .big{font-size:4rem;filter:drop-shadow(0 0 15px var(--p2))}
+  .face h2{font-family:'Orbitron',sans-serif;font-size:1.2rem}
+  .face p{color:var(--muted);line-height:1.6;font-size:.95rem}
+  .close{position:absolute;top:20px;right:24px;font-size:2rem;color:#fff;cursor:pointer;z-index:2}
+
+  /* ============ REPRODUCTOR ESTILO SPOTIFY ============ */
+  #player{
+    position:fixed;z-index:60;right:18px;bottom:18px;width:min(360px,calc(100vw - 36px));
+    padding:16px;border-radius:20px;background:rgba(20,16,36,.72);
+    border:1px solid var(--border);backdrop-filter:blur(16px);
+    box-shadow:0 0 35px rgba(121,40,202,.45);
+    transition:transform .4s;
+  }
+  #player.mini #list,#player.mini .vol{display:none}
+  .row{display:flex;align-items:center;gap:12px}
+  .cover{
+    width:56px;height:56px;border-radius:12px;flex:none;
+    background:conic-gradient(from 0deg,var(--p1),var(--p2),#1a1030,var(--p1));
+    box-shadow:0 0 18px var(--glow);position:relative;
+  }
+  .cover::after{content:"";position:absolute;inset:40%;border-radius:50%;background:var(--bg)}
+  .cover.spin{animation:spin 4s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .info{min-width:0;flex:1}
+  .info b{display:block;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .info span{font-size:.78rem;color:var(--muted)}
+  .toggle{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem}
+
+  .controls{display:flex;align-items:center;justify-content:center;gap:18px;margin:12px 0 6px}
+  .controls button{background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;transition:.2s}
+  .controls button:hover{color:var(--p2);text-shadow:0 0 12px var(--p2);transform:scale(1.15)}
+  .controls #play{
+    width:46px;height:46px;border-radius:50%;font-size:1.1rem;color:#fff;
+    background:linear-gradient(135deg,var(--p1),var(--p2));box-shadow:0 0 18px var(--glow);
+  }
+
+  .bar{display:flex;align-items:center;gap:8px;font-size:.7rem;color:var(--muted)}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:5px;outline:none;cursor:pointer;
+    background:linear-gradient(90deg,var(--p2) var(--v,0%),rgba(255,255,255,.15) var(--v,0%));
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:#fff;
+    box-shadow:0 0 10px var(--p2);
+  }
+  input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-radius:50%;background:#fff;box-shadow:0 0 10px var(--p2)}
+  .vol{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.85rem}
+  .vol input{max-width:140px}
+
+  /* Lista de canciones (aquí se cambia de canción) */
+  #list{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+  .track{
+    display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;cursor:pointer;
+    background:var(--glass);border:1px solid transparent;transition:.25s;font-size:.85rem;
+  }
+  .track:hover{border-color:var(--border);transform:translateX(4px)}
+  .track.active{border-color:var(--p2);box-shadow:0 0 14px var(--glow);background:rgba(183,33,255,.15)}
+  .track small{color:var(--muted);margin-left:auto}
+
+  @media(max-width:520px){
+    #player{right:9px;bottom:9px;padding:12px}
+    .card3d{height:420px}
+  }
+</style>
+</head>
+
+<body>
+<canvas id="bg"></canvas>
+<canvas id="confetti"></canvas>
+
+<!-- ============ PANTALLA DE ENTRADA ============ -->
+<div id="intro">
+  <p>Hay algo especial para ti</p>
+  <button class="btn" id="enter">▶ ABRIR</button>
+</div>
+
+<!-- ============ CONTENIDO PRINCIPAL ============ -->
+<main>
+  <div class="tag">✦ Level 15 Unlocked ✦</div>
+  <h1>Feliz Cumpleaños Ruth✨</h1>
+  <div class="age">✨ Tus 15 Años ✨</div>
+
+  <div class="actions">
+    <button class="btn" id="btnSorpresa">🎁 ABRIR SORPRESA</button>
+    <button class="btn ghost" id="btnConfeti">🎉 LANZAR CONFETI</button>
+  </div>
+</main>
+
+<!-- ============ TARJETA SORPRESA ============ -->
+<div id="modal">
+  <span class="close" id="cerrar">&times;</span>
+  <div class="card3d" id="card">
+    <div class="card-inner">
+      <div class="face">
+        <div class="big">🎁</div>
+        <h2>Un mensaje para ti</h2>
+        <p>Toca la tarjeta para abrirla</p>
+      </div>
+      <div class="face back">
+        <div class="big">💜</div>
+        <h2 id="cartaTitulo"></h2>
+        <p id="cartaTexto"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ REPRODUCTOR ============ -->
+<div id="player">
+  <div class="row">
+    <div class="cover" id="cover"></div>
+    <div class="info"><b id="tTitle">—</b><span id="tArtist">—</span></div>
+    <button class="toggle" id="miniBtn" title="Minimizar">▾</button>
+  </div>
+
+  <div class="controls">
+    <button id="prev" title="Anterior">⏮</button>
+    <button id="play" title="Play / Pausa">▶</button>
+    <button id="next" title="Siguiente">⏭</button>
+  </div>
+
+  <div class="bar">
+    <span id="cur">0:00</span>
+    <input type="range" id="seek" min="0" max="1000" value="0">
+    <span id="dur">0:00</span>
+  </div>
+
+  <div class="vol">🔊 <input type="range" id="volume" min="0" max="100" value="70"></div>
+
+  <!-- Lista de canciones: clic para cambiar -->
+  <div id="list"></div>
+</div>
+
+
+<script>
+/* =====================================================
+   CONFIGURACIÓN — EDITA AQUÍ
+   ===================================================== */
+const MENSAJE = {
+  titulo: "¡Feliz cumple, Ruth!",
+  texto:  "Que este nuevo año esté lleno de cosas bonitas. Te lo mereces. 💜"
+};
+
+// Playlist (los archivos deben estar en la misma carpeta que este HTML)
+const TRACKS = [
+  { title:"Blinding Lights", artist:"The Weeknd",                             src:"blinding-lights.mp4" },
+  { title:"One Of The Girls", artist:"The Weeknd, JENNIE, Lily-Rose Depp",    src:"one-of-the-girls.mp4" }
+];
+
+/* =====================================================
+   TEXTOS
+   ===================================================== */
+const $ = id => document.getElementById(id);
+$('cartaTitulo').textContent = MENSAJE.titulo;
+$('cartaTexto').textContent  = MENSAJE.texto;
+
+/* =====================================================
+   REPRODUCTOR
+   ===================================================== */
+const audio = new Audio();
+let current = 0, playing = false, started = false;
+
+// Construir la lista visible (clic para cambiar de canción)
+function buildList(){
+  $('list').innerHTML = '';
+  TRACKS.forEach((t,i)=>{
+    const d = document.createElement('div');
+    d.className = 'track' + (i===current ? ' active':'');
+    d.innerHTML = `<span>${i===current?'🎵':'▫️'}</span><div><b>${t.title}</b><br><small style="margin:0">${t.artist}</small></div>`;
+    d.onclick = () => loadTrack(i, true);
+    $('list').appendChild(d);
+  });
+}
+
+// Cargar y (opcionalmente) reproducir una canción
+function loadTrack(i, play=true){
+  current = i; const t = TRACKS[i];
+  audio.pause();
+  $('tTitle').textContent = t.title; $('tArtist').textContent = t.artist;
+  $('seek').value = 0; $('cur').textContent = '0:00'; $('dur').textContent = '0:00'; paintSeek();
+  buildList();
+  audio.src = t.src; audio.load();
+  if (play) audio.play().catch(()=>setPlaying(false));
+}
+
+function togglePlay(){ audio.paused ? audio.play() : audio.pause(); }
+function nextTrack(){ loadTrack((current+1) % TRACKS.length, true); }
+function prevTrack(){
+  // si ya avanzó más de 3s, reinicia; si no, canción anterior
+  if (audio.currentTime > 3) audio.currentTime = 0;
+  else loadTrack((current-1+TRACKS.length)%TRACKS.length, true);
+}
+
+function setPlaying(v){
+  playing = v;
+  $('play').textContent = v ? '⏸' : '▶';
+  $('cover').classList.toggle('spin', v);
+}
+
+const fmt = n => { n=Math.floor(n||0); return Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); };
+function paintSeek(){ $('seek').style.setProperty('--v', ($('seek').value/10)+'%'); }
+function paintVol(){ $('volume').style.setProperty('--v', $('volume').value+'%'); }
+
+audio.addEventListener('play',  () => setPlaying(true));
+audio.addEventListener('pause', () => setPlaying(false));
+audio.addEventListener('ended', nextTrack);
+
+// Actualizar barra de progreso 4 veces por segundo
+let dragging = false;
+setInterval(()=>{
+  const cur = audio.currentTime||0, dur = audio.duration||0;
+  $('cur').textContent = fmt(cur); $('dur').textContent = fmt(dur);
+  if (!dragging && dur){ $('seek').value = (cur/dur)*1000; paintSeek(); }
+}, 250);
+
+// Controles
+$('play').onclick = togglePlay;
+$('next').onclick = nextTrack;
+$('prev').onclick = prevTrack;
+$('seek').addEventListener('pointerdown', ()=>dragging=true);
+$('seek').addEventListener('pointerup',   ()=>dragging=false);
+$('seek').addEventListener('input', e=>{
+  paintSeek();
+  if (audio.duration) audio.currentTime = (e.target.value/1000)*audio.duration;
+});
+$('volume').addEventListener('input', e=>{
+  audio.volume = e.target.value/100; paintVol();
+});
+$('miniBtn').onclick = ()=>{
+  $('player').classList.toggle('mini');
+  $('miniBtn').textContent = $('player').classList.contains('mini') ? '▴' : '▾';
+};
+audio.volume = .7; paintVol(); paintSeek();
+$('tTitle').textContent = TRACKS[0].title; $('tArtist').textContent = TRACKS[0].artist;
+buildList();
+
+/* =====================================================
+   ENTRADA (el clic permite el autoplay del navegador)
+   ===================================================== */
+$('enter').onclick = ()=>{
+  $('intro').classList.add('hide');
+  if (!started){ started = true; loadTrack(0, true); }
+  confettiBurst(140);
+};
+
+/* =====================================================
+   TARJETA SORPRESA
+   ===================================================== */
+$('btnSorpresa').onclick = ()=>{ $('modal').classList.add('open'); $('card').classList.remove('flip'); };
+$('card').onclick = ()=>{
+  const f = $('card').classList.toggle('flip');
+  if (f) confettiBurst(120);
+};
+$('cerrar').onclick = ()=> $('modal').classList.remove('open');
+$('modal').onclick = e => { if (e.target.id==='modal') $('modal').classList.remove('open'); };
+$('btnConfeti').onclick = ()=> confettiBurst(200);
+
+/* =====================================================
+   FONDO: ESTRELLAS / PARTÍCULAS MORADAS FLOTANTES
+   ===================================================== */
+const bg = $('bg'), bctx = bg.getContext('2d');
+let stars = [];
+function sizeBg(){
+  bg.width = innerWidth; bg.height = innerHeight;
+  stars = Array.from({length: Math.min(110, innerWidth/10)}, ()=>({
+    x:Math.random()*bg.width, y:Math.random()*bg.height,
+    r:Math.random()*2+.4, vy:Math.random()*.4+.1, a:Math.random(),
+    c:Math.random()>.5 ? '183,33,255' : '121,40,202'
+  }));
+}
+addEventListener('resize', sizeBg); sizeBg();
+(function loopBg(){
+  bctx.clearRect(0,0,bg.width,bg.height);
+  stars.forEach(p=>{
+    p.y -= p.vy; p.a += .02;
+    if (p.y < -5){ p.y = bg.height+5; p.x = Math.random()*bg.width; }
+    const al = .35 + Math.sin(p.a)*.35;
+    bctx.beginPath(); bctx.arc(p.x,p.y,p.r,0,7);
+    bctx.fillStyle = `rgba(${p.c},${al})`;
+    bctx.shadowColor = `rgba(${p.c},1)`; bctx.shadowBlur = 12; bctx.fill();
+  });
+  requestAnimationFrame(loopBg);
+})();
+
+/* =====================================================
+   CONFETI DIGITAL MORADO
+   ===================================================== */
+const cv = $('confetti'), cx = cv.getContext('2d');
+let bits = [];
+function sizeCv(){ cv.width = innerWidth; cv.height = innerHeight; }
+addEventListener('resize', sizeCv); sizeCv();
+const COLORS = ['#b721ff','#7928ca','#d69bff','#ffffff','#5b2bff','#ff6bf1'];
+function confettiBurst(n=150){
+  for (let i=0;i<n;i++){
+    const ang = Math.random()*Math.PI*2, sp = Math.random()*9+4;
+    bits.push({
+      x:innerWidth/2, y:innerHeight/2.4,
+      vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp - 5,
+      w:Math.random()*8+4, h:Math.random()*5+3,
+      rot:Math.random()*6, vr:(Math.random()-.5)*.4,
+      c:COLORS[Math.floor(Math.random()*COLORS.length)], life:1
+    });
+  }
+}
+(function loopC(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  bits = bits.filter(b=>b.life>0);
+  bits.forEach(b=>{
+    b.vy += .22; b.vx *= .99; b.x += b.vx; b.y += b.vy; b.rot += b.vr; b.life -= .008;
+    cx.save(); cx.translate(b.x,b.y); cx.rotate(b.rot);
+    cx.globalAlpha = Math.max(b.life,0); cx.fillStyle = b.c;
+    cx.shadowColor = b.c; cx.shadowBlur = 10;
+    cx.fillRect(-b.w/2,-b.h/2,b.w,b.h); cx.restore();
+  });
+  requestAnimationFrame(loopC);
+})();
+</script>
+</body>
+</html>
